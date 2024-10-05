@@ -32,21 +32,18 @@ pub fn type_command(command: &str) {
 pub fn ls_command(command: &str) {
     match fs::read_dir(command) {
         Ok(entries) => for entry in entries {
-            print!("{:?}\t", entry.unwrap().path());
+            let each = entry.unwrap().path();
+            let metadata_each = fs::metadata(each.clone());
+            let str_path = each.to_str().unwrap();
+            let sliced_path = &str_path[2..];
+            if metadata_each.unwrap().is_dir() {
+                println!("\x1B[34m{}\x1B[0m", sliced_path);
+            } else {
+                println!("{}", sliced_path);
+            }
         },
         Err(_err) => print!("rush: ls: cannot access {:?}: No such file or directory", command)
     }
-    println!("");
-}
-
-pub fn empty_ls_command() {
-    match fs::read_dir(".") {
-        Ok(entries) => for entry in entries {
-            print!("{:?}\t", entry.unwrap().path());
-        },
-        Err(err) => println!("{}", err)
-    }
-    println!("");
 }
 
 pub fn cat_command(files: Vec<&str>) {
@@ -88,6 +85,24 @@ pub fn pwd_command() {
     println!("{}", env::current_dir().unwrap().display());
 }
 
+pub fn display_colored_pwd() {
+    let home_dir = env::var("HOME").unwrap();
+    let len_home = home_dir.len();
+    let present_dir = env::current_dir().unwrap();
+    let str_present_dir = present_dir.to_str().unwrap();
+    if home_dir == present_dir.to_str().unwrap() {
+        println!("\x1B[36m ~\x1B[0m");
+    } else {
+        if str_present_dir.starts_with(&home_dir) {
+            let replaced_present_dir = &str_present_dir[len_home..];
+            println!("\x1B[36m ~{}\x1B[0m", replaced_present_dir);
+        } else {
+            println!("\x1B[36m{}\x1B[0m", present_dir.display());
+        }
+    }
+}
+
+
 pub fn cd_command(dir: &str) {
     if dir == "~" {
         let home = env::var("HOME").unwrap();
@@ -101,4 +116,14 @@ pub fn cd_command(dir: &str) {
             println!("rush: cd: {:?}: No such file or directory", dir);
         }
     }
+}
+
+pub fn touch_command(files: Vec<&str>) {
+    for file in files {
+        fs::File::create_new(file).unwrap();
+    }
+}
+
+pub fn cp_command(files: Vec<&str>) {
+    fs::copy(files[0], files[1]).unwrap();
 }
