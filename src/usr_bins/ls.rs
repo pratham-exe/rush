@@ -1,17 +1,28 @@
-use std::{
-    process::Command,
-    fs,
-};
+use std::fs;
 use std::os::unix::fs::PermissionsExt;
-
-pub fn clear_command() {
-    Command::new("clear").status().unwrap();
-}
 
 pub fn ls_command(mut command: Vec<&str>) {
     if command.len() == 0 {
         command = ["."].to_vec();
+        ls_command_normal(command, '-', String::new())
+    } else {
+        let flags = command[0];
+        let check_flags = flags.to_string().as_bytes()[0] as char;
+        if check_flags == '-' && flags.find('l').is_some() {
+            ls_command_perm(command[1..].to_vec(), check_flags, flags.to_string());
+        } else if check_flags == '-' && flags.find('a').is_some() {
+            let mut new_command = ["."].to_vec();
+            if command.len() > 2 {
+                new_command = command[1..].to_vec();
+            }
+            ls_command_normal(new_command, '-', flags.to_string())
+        } else {
+            ls_command_normal(command[0..].to_vec(), '-', String::new())
+        }
     }
+}
+
+fn ls_command_normal(command: Vec<&str>, check_flags: char, flags: String) {
     for each_command in command {
         println!("\n\x1B[33m{}:\x1B[0m", each_command);
         match fs::read_dir(each_command) {
@@ -25,13 +36,13 @@ pub fn ls_command(mut command: Vec<&str>) {
                 }
                 if metadata_each.unwrap().is_dir() {
                     let ch = sliced_path.to_string().as_bytes()[0] as char;
-                    if ch == '.' {
+                    if check_flags == '-' && !flags.find('a').is_some() && ch == '.' {
                         continue;
                     }
                     println!("\x1B[34m{}\x1B[0m", sliced_path);
                 } else {
                     let ch = sliced_path.to_string().as_bytes()[0] as char;
-                    if ch == '.' {
+                    if check_flags == '-' && !flags.find('a').is_some() && ch == '.' {
                         continue;
                     }
                     println!("{}", sliced_path);
@@ -57,7 +68,7 @@ fn get_perm_str(mode: u32) -> String {
     res
 }
 
-pub fn ls_command_perm(mut command: Vec<&str>) {
+fn ls_command_perm(mut command: Vec<&str>, check_flags: char, flags: String) {
     if command.len() == 0 {
         command = ["."].to_vec();
     }
@@ -77,99 +88,20 @@ pub fn ls_command_perm(mut command: Vec<&str>) {
                    sliced_path = &str_path[2..];
                }
                if metadata_each.unwrap().is_dir() {
+                   let ch = sliced_path.to_string().as_bytes()[0] as char;
+                   if check_flags == '-' && !flags.find('a').is_some() && ch == '.' {
+                       continue;
+                   }
                    println!("\x1B[34m{} {}\x1B[0m", perm_str, sliced_path);
                } else {
+                   let ch = sliced_path.to_string().as_bytes()[0] as char;
+                   if check_flags == '-' && !flags.find('a').is_some() && ch == '.' {
+                       continue;
+                   }
                    println!("{} {}", perm_str, sliced_path);
                }
            },
            Err(_err) => println!("rush: ls: cannot access {:?}: No such file or directory", each_command)
         }
-    }
-}
-
-pub fn cat_command(files: Vec<&str>) {
-    for file in files {
-        println!("\n\x1B[33m{}:\x1B[0m", file);
-        let content: String = fs::read_to_string(file).unwrap();
-        println!("{}", content);
-    }
-}
-
-pub fn mkdir_command(new_dirs: Vec<&str>) {
-    for new_dir in new_dirs {
-        fs::create_dir(new_dir).unwrap();
-    }
-}
-
-pub fn rmdir_command(dirs: Vec<&str>) {
-    for dir in dirs {
-        fs::remove_dir(dir).unwrap();
-    }
-}
-
-pub fn rmdirr_command(dirs: Vec<&str>) {
-    for dir in dirs {
-        fs::remove_dir_all(dir).unwrap();
-    }
-}
-
-pub fn rm_command(files: Vec<&str>) {
-    for file in files {
-        fs::remove_file(file).unwrap();
-    }
-}
-
-pub fn mv_command(files: Vec<&str>) {
-    fs::rename(files[0], files[1]).unwrap();
-}
-
-pub fn touch_command(files: Vec<&str>) {
-    for file in files {
-        fs::File::create_new(file).unwrap();
-    }
-}
-
-pub fn cp_command(files: Vec<&str>) {
-    fs::copy(files[0], files[1]).unwrap();
-}
-
-pub fn grep_command(command: Vec<&str>) {
-    let pattern = command[0];
-    let len_pattern = pattern.len();
-    let files = &command[1..];
-    for file in files {
-        let content: String = match fs::read_to_string(file) {
-            Ok(content) => content,
-            Err(_err) => {
-                let metadata = fs::metadata(file);
-                if metadata.unwrap().is_dir() {
-                    print!("grep: {}: Is a directory", file);
-                } else {
-                    print!("grep: {}: No such file or directory", file);
-                }
-                String::new()
-            }
-        };
-        for line in content.lines() {
-            if !line.find(pattern).is_some() {
-                continue;
-            }
-            let len_line = line.len();
-            let stop_num = len_line - len_pattern + 1;
-            print!("\n\x1B[33m{}: \x1B[0m", file);
-            let mut i = 0;
-            while i < stop_num {
-                if line[i..i+len_pattern] == *pattern {
-                    print!("\x1B[31m{}\x1B[0m", &line[i..i+len_pattern]);
-                    i += len_pattern;
-                } else {
-                    let ch = line.to_string().as_bytes()[i] as char;
-                    print!("{}", ch);
-                    i += 1;
-                }
-            }
-            print!("{}", &line[i..]);
-        }
-        println!("");
     }
 }

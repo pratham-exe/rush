@@ -4,7 +4,7 @@ A Shell written in Rust.
 
 ## TODO
 
-- [X] exit, clear, echo, type, ls, cat, mkdir, rmdir, rm, mv, pwd, cd, touch, cp, ls
+- [X] exit, clear, echo, type, ls, cat, mkdir, rmdir, rm, mv, pwd, cd, touch, cp
 - [X] grep
 - [ ] pipe
 - [ ] keydown event
