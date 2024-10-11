@@ -28,6 +28,7 @@ fn repeat() {
             ["cat", ..] => usr_bin_functions::cat_command(command[1..].to_vec()),
             ["mkdir", ..] => usr_bin_functions::mkdir_command(command[1..].to_vec()),
             ["rmdir", ..] => usr_bin_functions::rmdir_command(command[1..].to_vec()),
+            ["rmdirr", ..] => usr_bin_functions::rmdirr_command(command[1..].to_vec()),
             ["rm", ..] => usr_bin_functions::rm_command(command[1..].to_vec()),
             ["mv", ..] => usr_bin_functions::mv_command(command[1..].to_vec()),
             ["touch", ..] => usr_bin_functions::touch_command(command[1..].to_vec()),

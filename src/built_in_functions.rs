@@ -44,7 +44,6 @@ pub fn display_colored_pwd() {
     }
 }
 
-
 pub fn cd_command(dir: &str) {
     if dir == "~" {
         let home = env::var("HOME").unwrap();
