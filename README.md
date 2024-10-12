@@ -1,11 +1,12 @@
 # rush
 
-A Shell written in Rust.
+A Basic Shell written in Rust.
 
-## TODO
+## Quick Start
 
-- [X] exit, clear, echo, type, ls, cat, mkdir, rmdir, rm, mv, pwd, cd, touch, cp
-- [X] grep
-- [ ] pipe
-- [ ] keydown event
-- [ ] autocomplete using tab key
+```
+git clone https://github.com/pratham-exe/rush.git
+cd rush
+cargo build
+cargo run
+```

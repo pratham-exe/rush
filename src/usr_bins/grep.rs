@@ -1,6 +1,7 @@
 use std::fs;
 
 pub fn grep_command(command: Vec<&str>) {
+    print!("{:?}", command);
     let pattern = command[0];
     let len_pattern = pattern.len();
     let files = &command[1..];

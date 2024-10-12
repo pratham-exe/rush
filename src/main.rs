@@ -19,7 +19,6 @@ fn repeat() {
             ["exit"] => break,
             [] => continue,
             ["echo", ..] => built_ins::echo::echo_command(param_command),
-            ["type", ..] => built_ins::typee::type_command(param_command),
             ["pwd"] => built_ins::pwd::pwd_command(),
             ["cd", ..] => built_ins::cd::cd_command(param_command),
             ["clear"] => usr_bins::clear::clear_command(),
@@ -39,5 +38,21 @@ fn repeat() {
 }
 
 fn main() {
+    println!("Features available in the rush shell:
+        1. exit
+        2. echo
+        3. pwd
+        4. cd
+        5. clear
+        6. ls
+        7. cat
+        8. mkdir
+        9. rmdir
+       10. rmdirr
+       11. rm
+       12. mv
+       13. touch
+       14. cp
+       15. grep");
     repeat();
 }

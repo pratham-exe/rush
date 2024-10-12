@@ -12,7 +12,7 @@ pub fn ls_command(mut command: Vec<&str>) {
             ls_command_perm(command[1..].to_vec(), check_flags, flags.to_string());
         } else if check_flags == '-' && flags.find('a').is_some() {
             let mut new_command = ["."].to_vec();
-            if command.len() > 2 {
+            if command.len() > 1 {
                 new_command = command[1..].to_vec();
             }
             ls_command_normal(new_command, '-', flags.to_string())
